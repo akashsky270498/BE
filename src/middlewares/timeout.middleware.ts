@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { logger } from "../utils/logger";
 import timeout from "connect-timeout";
-// import { HTTP_STATUS_CODES } from "../utils/constants";
+import { HTTP_STATUS_CODES } from "../utils/constants";
 import RESPONSE from "../utils/response";
 
 
@@ -37,7 +37,7 @@ function handleTimeout(req: Request, res: Response, next: NextFunction) {
             headers: req.headers,
         });
 
-        return RESPONSE.FailureResponse(res, 408, {
+        return RESPONSE.FailureResponse(res, HTTP_STATUS_CODES.TIMEOUT, {
             message: 'Request Timeout',
             errors: [
                 {

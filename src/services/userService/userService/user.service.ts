@@ -1,6 +1,6 @@
 import { checkExistingUser, createNewUser, sanitizeUser } from '../userDBCall/user.dbcall';
-// import { uploadOnCloudinary } from '../../../utils/cloundinary';
 import { UserModel } from '../userModel/user.model';
+import { HTTP_STATUS_CODES } from '../../../utils/constants';
 
 interface RegisterUser {
   fullName: string;
@@ -18,16 +18,11 @@ export const registerUserService = async (input: RegisterUser) => {
   if (existingUser) {
     return {
       error: true,
-      status: 409,
+      status: HTTP_STATUS_CODES.CONFLICT,
       message: 'User with these email or username already exists. Please login!',
     };
   }
 
-  // const uploadAvatar = await uploadOnCloudinary(avatar);
-
-  // if (!uploadAvatar) {
-  //   return { error: true, status: 500, message: 'Failed to upload avatar.' };
-  // }
 
   const user = await createNewUser({
     fullName,
@@ -40,10 +35,10 @@ export const registerUserService = async (input: RegisterUser) => {
   const createdUser = await sanitizeUser(user._id.toString());
 
   if (!createdUser) {
-    return { error: true, status: 500, message: 'User creation failed.' };
+    return { error: true, status: HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, message: 'User creation failed.' };
   }
 
-  return { error: false, status: 201, message: 'User registered successfully.', data: createdUser };
+  return { error: false, status: HTTP_STATUS_CODES.CREATED, message: 'User registered successfully.', data: createdUser };
 };
 
 export const getAllUsersService = async () => {
@@ -55,14 +50,14 @@ export const getAllUsersService = async () => {
 
     return {
       error: false,
-      status: 200,
+      status: HTTP_STATUS_CODES.SUCCESS,
       message: 'Users fetched successfully',
       data: users,
     };
   } catch (error) {
     return {
       error: true,
-      status: 500,
+      status: HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
       message: 'Failed to fetch users',
       data: [],
     };

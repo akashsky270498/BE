@@ -7,6 +7,7 @@ import cors from 'cors';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default'; // ✅ add this
 import { userTypeDef } from '../services/userService/userTypedefs/user.typedefs';
 import { userResolver } from '../services/userService/userResolvers/user.resolvers';
+import { HTTP_STATUS_CODES } from '../utils/constants';
 
 export const createGraphQLServer = async (app: Express) => {
   const server = new ApolloServer({
@@ -14,7 +15,7 @@ export const createGraphQLServer = async (app: Express) => {
     resolvers: [userResolver],
     introspection: true,
     plugins: [
-      // ✅ This enables the embedded local Sandbox UI
+      //This enables the embedded local Sandbox UI
       ApolloServerPluginLandingPageLocalDefault({ embed: true }),
     ],
     formatError: (formattedError: GraphQLFormattedError) => {
@@ -22,7 +23,9 @@ export const createGraphQLServer = async (app: Express) => {
         message: formattedError.message,
         success: false,
         statusCode:
-          formattedError.extensions?.code === 'BAD_USER_INPUT' ? 400 : 500,
+          formattedError.extensions?.code === 'BAD_USER_INPUT'
+            ? HTTP_STATUS_CODES.BAD_REQUEST
+            : HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
         errors: [],
       };
     },
@@ -35,7 +38,7 @@ export const createGraphQLServer = async (app: Express) => {
       'http://localhost:3000',
       'http://localhost:7555',
       'https://studio.apollographql.com',
-      'https://sandbox.apollo.dev'
+      'https://sandbox.apollo.dev',
     ],
     credentials: true,
   };
@@ -50,7 +53,7 @@ export const createGraphQLServer = async (app: Express) => {
           headers: req.headers,
         };
       },
-    }),
+    })
   );
 
   return app;
