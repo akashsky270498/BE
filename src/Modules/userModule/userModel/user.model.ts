@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { comparePassword, generateAccessTokenSync, generateResetPasswordToken, canViewProfileOf, toggleFollow } from "./user.methods";
+import { comparePassword, generateAccessTokenSync, generateResetPasswordToken, canViewProfileOf, toggleFollow } from "../userDBCall/user.dbcall";
 import userSchema from "./user.schema";
 import bcrypt from "bcrypt";
 import { DEFAULT_VALUES } from "../../../utils/constants";

@@ -5,8 +5,8 @@ import { GraphQLFormattedError } from 'graphql';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default'; // ✅ add this
-import { userTypeDef } from '../services/userService/userTypedefs/user.typedefs';
-import { userResolver } from '../services/userService/userResolvers/user.resolvers';
+import { userTypeDef } from '../Modules/userModule/userTypedefs/user.typedefs';
+import { userResolver } from '../Modules/userModule/userResolvers/user.resolvers';
 import { HTTP_STATUS_CODES } from '../utils/constants';
 
 export const createGraphQLServer = async (app: Express) => {

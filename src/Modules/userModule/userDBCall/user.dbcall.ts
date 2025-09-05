@@ -1,9 +1,27 @@
+import { UserModel } from '../userModel/user.model';
 import { IUser } from "../userInterface/user.interface";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import jwt, { SignOptions } from 'jsonwebtoken';
 import { env } from "../../../config/env.config";
 import { DEFAULT_VALUES } from "../../../utils/constants";
+
+export const checkExistingUser = async (email: string, username: string) => {
+  const existingUser = await UserModel.findOne({
+    $or: [{ email }, { username }],
+  });
+  return existingUser;
+};
+
+export const createNewUser = async (userData: unknown) => {
+  const createUser = await UserModel.create(userData);
+  return createUser;
+};
+
+export const sanitizeUser = async (userId: string) => {
+  const sanitizedUser = await UserModel.findById(userId).select('-password -refreshToken');
+  return sanitizedUser;
+};
 
 export async function comparePassword(this: IUser, enteredPassword: string): Promise<boolean> {
     return await bcrypt.compare(enteredPassword, this.password);
