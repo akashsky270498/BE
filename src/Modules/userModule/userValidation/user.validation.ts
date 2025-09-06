@@ -54,3 +54,26 @@ export const registerUserValidation = Joi.object({
       "string.uri": "Avatar URL must be a valid URI",
     }),
 });
+
+export const loginValidation = Joi.object({
+  emailOrUsername: Joi.string()
+    .required()
+    .messages({
+      "any.required": "Email or Username is required.",
+      "string.empty": "Email or Username cannot be empty.",
+    }),
+
+  password: Joi.string()
+    .min(8)
+    .max(32)
+    .pattern(new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).{8,32}$"))
+    .required()
+    .messages({
+      "string.empty": "Password cannot be empty.",
+      "string.min": "Password must be at least 8 characters long.",
+      "string.max": "Password cannot be more than 32 characters long.",
+      "string.pattern.base":
+        "Password must include at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.",
+      "any.required": "Password is required.",
+    }),
+});

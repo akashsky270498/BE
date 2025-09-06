@@ -1,8 +1,8 @@
-import { registerUserService, loginUserService } from '../userService/user.service';
+import { registerUserService } from '../userService/user.service';
 import { Request, Response } from 'express';
 import RESPONSE from '../../../utils/response';
 import { asyncHandler } from '../../../utils/asyncHandler';
-import redis from '../../../config/redis.config';
+import redis from "../../../config/redis.config";
 import { HTTP_STATUS_CODES } from '../../../utils/constants';
 
 const registerUser = asyncHandler(async (req: Request, res: Response) => {
@@ -20,7 +20,7 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
     email,
     username,
     password,
-    avatar: avatarUrl,
+    avatar:avatarUrl,
   });
 
   if (result.error) {
@@ -40,29 +40,4 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-const loginUser = asyncHandler(async (req: Request, res: Response) => {
-  const { emailOrUsername, password } = req.body;
-
-  if (!emailOrUsername || !password) {
-    return RESPONSE.FailureResponse(res, HTTP_STATUS_CODES.BAD_REQUEST, {
-      message: 'Email || Username and password are required.',
-    });
-  }
-
-  const result = await loginUserService({ emailOrUsername, password });
-
-  if (result.error) {
-    return RESPONSE.FailureResponse(res, result.status, {
-      message: result.message,
-    });
-  }
-
-  await redis.del('users:all');
-
-  return RESPONSE.SuccessResponse(res, result.status, {
-    message: result.message,
-    data: [result.data],
-  });
-});
-
-export { registerUser, loginUser };
+export { registerUser };

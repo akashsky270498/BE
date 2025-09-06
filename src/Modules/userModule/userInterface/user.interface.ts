@@ -20,8 +20,8 @@ export interface IUser extends Document {
     followings: Types.ObjectId[];
 
     comparePassword(enteredPassword: string): Promise<boolean>;
-    generateAccessTokenAsync(): Promise<string>;
-    generateRefreshTokenAsync(): Promise<string>;
+    generateAccessTokenSync(): string;
+    generateRefreshTokenSync(): string;
     // getResetPasswordToken(): string;
     generateResetPasswordToken(): Promise<string>;
     canViewProfileOf(targetUset: IUser): boolean;
@@ -30,4 +30,17 @@ export interface IUser extends Document {
 
 export interface IUserModel extends mongoose.Model<IUser> {
     searchUsers(query: string): Promise<Partial<IUser>[]>;
+}
+
+export interface RegisterUser {
+  fullName: string;
+  email: string;
+  username: string;
+  password: string;
+  avatar: string;
+}
+
+export interface LoginInput {
+  emailOrUsername: string;
+  password: string;
 }

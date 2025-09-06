@@ -1,14 +1,8 @@
 import { checkExistingUser, createNewUser, sanitizeUser } from '../userDBCall/user.dbcall';
 import { UserModel } from '../userModel/user.model';
 import { HTTP_STATUS_CODES } from '../../../utils/constants';
-
-interface RegisterUser {
-  fullName: string;
-  email: string;
-  username: string;
-  password: string;
-  avatar: string;
-}
+import { RegisterUser, LoginInput } from '../userInterface/user.interface';
+import { sanitizedUser } from '../userModel/user.method';
 
 export const registerUserService = async (input: RegisterUser) => {
   const { fullName, email, username, password, avatar } = input;
@@ -23,22 +17,30 @@ export const registerUserService = async (input: RegisterUser) => {
     };
   }
 
-
   const user = await createNewUser({
     fullName,
     email,
     username,
     password,
-    avatar ,
+    avatar,
   });
 
   const createdUser = await sanitizeUser(user._id.toString());
 
   if (!createdUser) {
-    return { error: true, status: HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, message: 'User creation failed.' };
+    return {
+      error: true,
+      status: HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
+      message: 'User creation failed.',
+    };
   }
 
-  return { error: false, status: HTTP_STATUS_CODES.CREATED, message: 'User registered successfully.', data: createdUser };
+  return {
+    error: false,
+    status: HTTP_STATUS_CODES.CREATED,
+    message: 'User registered successfully.',
+    data: createdUser,
+  };
 };
 
 export const getAllUsersService = async () => {
@@ -62,4 +64,47 @@ export const getAllUsersService = async () => {
       data: [],
     };
   }
+};
+
+export const loginUserService = async (input: LoginInput) => {
+  const { emailOrUsername, password } = input;
+
+  const user = await UserModel.findOne({
+    $or: [{ email: emailOrUsername }, { username: emailOrUsername }],
+  }).select("+password");
+
+  if (!user) {
+    return {
+      error: true,
+      status: HTTP_STATUS_CODES.UNAUTHORIZED,
+      message: 'Invalid credentials. Please try again.',
+    };
+  }
+
+  const isPasswordValid = await user.comparePassword(password);
+
+  if (!isPasswordValid) {
+    return {
+      error: true,
+      status: HTTP_STATUS_CODES.UNAUTHORIZED,
+      message: 'Invalid credentials. Please try again.',
+    };
+  }
+
+  const accessToken =  user.generateAccessTokenSync();
+  const refreshToken =  user.generateRefreshTokenSync();
+
+  // const { password: _, resetToken: __, ...sanitizedUser } = user.toObject();
+    const sanitizedUserData = await sanitizedUser(user._id.toString());
+
+  return {
+    error: false,
+    status: HTTP_STATUS_CODES.SUCCESS,
+    message: 'Login successful',
+    data: {
+      user: sanitizedUserData,
+      accessToken,
+      refreshToken,
+    },
+  };
 };

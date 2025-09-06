@@ -1,9 +1,8 @@
 import mongoose from "mongoose";
-import { comparePassword, generateAccessTokenSync, generateResetPasswordToken, generateRefreshTokenSync, canViewProfileOf, toggleFollow } from "../userModel/user.method";
+import { comparePassword, generateAccessTokenSync, generateResetPasswordToken, canViewProfileOf, toggleFollow } from "./user.method";
 import userSchema from "./user.schema";
 import bcrypt from "bcrypt";
 import { DEFAULT_VALUES } from "../../../utils/constants";
-import {IUser, IUserModel} from "../userInterface/user.interface";
 
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
@@ -14,7 +13,6 @@ userSchema.pre("save", async function (next) {
 
 userSchema.methods.comparePassword = comparePassword;
 userSchema.methods.generateAccessTokenSync = generateAccessTokenSync;
-userSchema.methods.generateRefreshTokenSync = generateRefreshTokenSync;
 userSchema.methods.generateResetPasswordToken = generateResetPasswordToken;
 userSchema.methods.canViewProfileOf = canViewProfileOf;
 userSchema.methods.toggleFOllow = toggleFollow;
@@ -37,4 +35,4 @@ userSchema.virtual("id").get(function () {
 userSchema.set("toJSON", { virtuals: true });
 userSchema.set("toObject", { virtuals: true });
 
-export const UserModel = mongoose.model<IUser, IUserModel>("User", userSchema);
+export const UserModel = mongoose.model("User", userSchema);
