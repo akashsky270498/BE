@@ -3,6 +3,7 @@ import { UserModel } from '../userModel/user.model';
 import { HTTP_STATUS_CODES } from '../../../utils/constants';
 import { RegisterUser, LoginInput } from '../userInterface/user.interface';
 import { sanitizedUser } from '../userModel/user.method';
+import { LoginResponse } from '../userInterface/user.interface';
 
 export const registerUserService = async (input: RegisterUser) => {
   const { fullName, email, username, password, avatar } = input;
@@ -66,7 +67,7 @@ export const getAllUsersService = async () => {
   }
 };
 
-export const loginUserService = async (input: LoginInput) => {
+export const loginUserService = async (input: LoginInput): Promise<LoginResponse> => {
   const { emailOrUsername, password } = input;
 
   const user = await UserModel.findOne({

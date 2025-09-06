@@ -57,11 +57,30 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
     });
   }
 
+  if (!result.data) {
+    return RESPONSE.FailureResponse(res, HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, {
+      message: 'Login failed unexpectedly.',
+    });
+  }
+  const { refreshToken, ...rest } = result.data;
+
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production', // only send over HTTPS in prod
+    sameSite: 'strict',
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  });
+
   await redis.del('users:all');
 
   return RESPONSE.SuccessResponse(res, result.status, {
     message: result.message,
-    data: [result.data],
+    data: [
+      {
+        user: rest.user,
+        accessToken: rest.accessToken,
+      },
+    ],
   });
 });
 

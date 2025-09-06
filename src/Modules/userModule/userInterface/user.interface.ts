@@ -44,3 +44,24 @@ export interface LoginInput {
   emailOrUsername: string;
   password: string;
 }
+
+interface LoginSuccessData {
+  user: unknown; 
+  accessToken: string;
+  refreshToken: string;
+}
+
+interface LoginSuccess {
+  error: false;
+  status: number;
+  message: string;
+  data: LoginSuccessData;
+}
+
+interface LoginFailure {
+  error: true;
+  status: number;
+  message: string;
+}
+
+export type LoginResponse = LoginSuccess | LoginFailure;
